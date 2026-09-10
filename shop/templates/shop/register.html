@@ -1,0 +1,159 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Create Account | ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        max-width: 480px;
+        margin: 4rem auto;
+        padding: 0 1rem;
+    }
+    
+    .auth-card {
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        padding: 2.5rem;
+    }
+    
+    .auth-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--primary-light, #e0e7ff);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem auto;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-header h1 {
+        font-family: 'DM Sans', sans-serif;
+        color: var(--text);
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-header p {
+        color: var(--text-secondary);
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text);
+        font-size: 0.95rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        color: var(--text);
+        transition: var(--transition);
+        background: var(--bg);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+        background: var(--card);
+    }
+    
+    .btn-submit {
+        width: 100%;
+        justify-content: center;
+        padding: 0.875rem;
+        font-size: 1.05rem;
+        margin-top: 1rem;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-light);
+        color: var(--text-secondary);
+    }
+    
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .auth-footer a:hover {
+        color: var(--accent);
+    }
+    
+    .password-hint {
+        font-size: 0.8rem;
+        color: var(--text-tertiary);
+        margin-top: 0.5rem;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Join ShopEase to manage your orders.</p>
+        </div>
+        
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" required autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password1">Password</label>
+                <input type="password" id="password1" name="password1" class="form-control" required autocomplete="new-password">
+                <span class="password-hint">Must be at least 8 characters long.</span>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password2">Confirm Password</label>
+                <input type="password" id="password2" name="password2" class="form-control" required autocomplete="new-password">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-submit">Create Account</button>
+        </form>
+        
+        <div class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends "shop/base.html" %}
+
+{% block title %}My Orders | ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-container {
+        margin-top: 2rem;
+    }
+    
+    .order-card {
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+    }
+    
+    .order-header {
+        background: var(--bg);
+        padding: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        gap: 1rem;
+    }
+    
+    .order-header-info {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .order-info-block {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        font-weight: 500;
+        color: var(--text);
+    }
+    
+    .order-id {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: var(--radius-xl);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .status-pending {
+        background: var(--warning-light);
+        color: var(--warning);
+    }
+    
+    .status-confirmed {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+    
+    .status-shipped {
+        background: #f3e8ff;
+        color: #9333ea;
+    }
+    
+    .status-delivered {
+        background: var(--success-light);
+        color: var(--success);
+    }
+    
+    .order-body {
+        padding: 1.5rem;
+    }
+    
+    .order-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .order-item {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .item-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+        border: 1px solid var(--border-light);
+    }
+    
+    .item-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-name {
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.25rem;
+        text-decoration: none;
+    }
+    
+    .item-name:hover {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+    
+    .item-meta {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .order-footer {
+        background: var(--card);
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    
+    .shipping-address {
+        max-width: 60%;
+    }
+    
+    .shipping-address p {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-top: 0.25rem;
+        line-height: 1.5;
+    }
+    
+    .empty-orders {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .order-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+        .shipping-address {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 style="font-family: 'DM Sans', sans-serif; color: var(--text); margin-bottom: 0.5rem;">My Orders</h1>
+    <p style="color: var(--text-secondary);">Welcome back, {{ user.username }}. Here is your order history.</p>
+</div>
+
+<div class="orders-container">
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-header-info">
+                    <div class="order-info-block">
+                        <span class="info-label">Order Number</span>
+                        <span class="order-id">#{{ order.id }}</span>
+                    </div>
+                    <div class="order-info-block">
+                        <span class="info-label">Date Placed</span>
+                        <span class="info-value">{{ order.created_at|date:"M j, Y" }}</span>
+                    </div>
+                    <div class="order-info-block">
+                        <span class="info-label">Total Amount</span>
+                        <span class="info-value">₹{{ order.total|floatformat:2 }}</span>
+                    </div>
+                    <div class="order-info-block">
+                        <span class="info-label">Items</span>
+                        <span class="info-value">{{ order.items.count }}</span>
+                    </div>
+                </div>
+                
+                <div class="status-badge 
+                    {% if order.status == 'Pending' %}status-pending
+                    {% elif order.status == 'Confirmed' %}status-confirmed
+                    {% elif order.status == 'Shipped' %}status-shipped
+                    {% elif order.status == 'Delivered' %}status-delivered
+                    {% else %}status-pending{% endif %}">
+                    {{ order.get_status_display|default:order.status }}
+                </div>
+            </div>
+            
+            <div class="order-body">
+                <div class="order-items">
+                    {% for item in order.items.all %}
+                    <div class="order-item">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-img">
+                        {% else %}
+                            <div class="item-img" style="display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-tertiary);">No Img</div>
+                        {% endif %}
+                        <div class="item-details">
+                            <a href="{% url 'product_detail' item.product.slug %}" class="item-name">{{ item.product.name }}</a>
+                            <span class="item-meta">Qty: {{ item.quantity }} × ₹{{ item.price|floatformat:2 }}</span>
+                            <span class="item-meta" style="font-weight: 600; color: var(--text); margin-top: 0.25rem;">₹{{ item.get_subtotal|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="order-footer">
+                <div class="shipping-address">
+                    <span class="info-label" style="display: block;">Delivered To</span>
+                    <p><strong>{{ order.name }}</strong><br>{{ order.address }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-orders">
+            <div class="empty-icon">📦</div>
+            <h2 style="font-family: 'DM Sans', sans-serif; margin-bottom: 0.5rem; color: var(--text);">No Orders Yet</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">You haven't placed any orders with us yet.</p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary">Start Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

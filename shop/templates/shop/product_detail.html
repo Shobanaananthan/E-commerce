@@ -1,0 +1,359 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{{ product.name }} - ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        max-width: 1280px;
+        margin: 40px auto;
+        padding: 0 24px;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+        display: flex;
+        gap: 8px;
+        color: var(--text-tertiary);
+        font-size: 0.875rem;
+        margin-bottom: 32px;
+        align-items: center;
+    }
+    .breadcrumbs a {
+        color: var(--text-secondary);
+    }
+    .breadcrumbs a:hover {
+        color: var(--accent);
+    }
+    .breadcrumbs span.separator {
+        font-size: 0.75rem;
+    }
+
+    /* Product Layout */
+    .product-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 48px;
+        margin-bottom: 80px;
+    }
+    @media (min-width: 992px) {
+        .product-layout {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .product-gallery {
+        background: var(--card);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow);
+        position: relative;
+    }
+    .product-gallery img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        display: block;
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .category-label {
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+    }
+
+    .title {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+        color: var(--primary);
+    }
+
+    .price {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 24px;
+    }
+
+    .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 24px 0;
+    }
+
+    .description {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        margin-bottom: 24px;
+    }
+
+    .stock-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 16px;
+    }
+    .stock-status.in-stock {
+        background: var(--success-light);
+        color: var(--success);
+    }
+    .stock-status.out-stock {
+        background: var(--danger-light);
+        color: var(--danger);
+    }
+    .stock-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+    
+    .low-stock-note {
+        color: var(--warning);
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-add-large {
+        flex: 2;
+        min-width: 200px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        border-radius: var(--radius-sm);
+        font-size: 1.125rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .btn-add-large:hover:not(:disabled) {
+        background: var(--accent);
+        box-shadow: 0 8px 24px rgba(249, 115, 22, 0.2);
+        transform: translateY(-2px);
+    }
+    .btn-add-large:disabled {
+        background: var(--border);
+        color: var(--text-tertiary);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    .btn-view-cart {
+        flex: 1;
+        min-width: 150px;
+        background: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        padding: 16px 32px;
+        border-radius: var(--radius-sm);
+        font-size: 1.125rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+        transition: var(--transition);
+    }
+    .btn-view-cart:hover {
+        background: var(--primary-light, #f1f5f9);
+    }
+
+    .feature-badges {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        background: var(--bg);
+        padding: 24px;
+        border-radius: var(--radius-lg);
+    }
+    .badge {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .badge-icon {
+        font-size: 1.5rem;
+        width: 48px;
+        height: 48px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+    }
+    .badge-text {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    /* Related Products */
+    .related-section {
+        margin-top: 80px;
+    }
+    .related-title {
+        font-size: 2rem;
+        margin-bottom: 32px;
+        text-align: center;
+    }
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 24px;
+    }
+    
+    /* Small Product Card styles inherited from products.html concepts */
+    .small-card {
+        background: white;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    .small-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+    }
+    .small-card-img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+    .small-card-info {
+        padding: 16px;
+    }
+    .small-card-title {
+        font-size: 1rem;
+        margin-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .small-card-price {
+        font-weight: 700;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="{% url 'product_list' %}">Home</a>
+        <span class="separator">▶</span>
+        <a href="{% url 'product_list' %}?category={{ product.category.slug }}">{{ product.category.name|default:"Products" }}</a>
+        <span class="separator">▶</span>
+        <span style="color: var(--text);">{{ product.name }}</span>
+    </div>
+
+    <div class="product-layout">
+        <div class="product-gallery">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <div style="background: #e2e8f0; width:100%; aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#64748b;">No Image Available</div>
+            {% endif %}
+        </div>
+
+        <div class="product-details">
+            {% if product.category %}
+            <div class="category-label">{{ product.category.name }}</div>
+            {% endif %}
+            
+            <h1 class="title">{{ product.name }}</h1>
+            <div class="price">₹{{ product.price }}</div>
+            
+            <div class="stock-status {% if product.stock > 0 %}in-stock{% else %}out-stock{% endif %}">
+                <span class="stock-dot"></span>
+                {% if product.stock > 0 %}In Stock ({{ product.stock }} available){% else %}Out of Stock{% endif %}
+            </div>
+            
+            {% if product.stock > 0 and product.stock <= 5 %}
+            <div class="low-stock-note">
+                ⚠️ Hurry! Only {{ product.stock }} left in stock.
+            </div>
+            {% endif %}
+
+            <div class="divider"></div>
+
+            <div class="description">
+                {{ product.description|linebreaks }}
+            </div>
+
+            <div class="action-buttons">
+                {% if product.stock > 0 %}
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn-add-large">Add to Cart</a>
+                {% else %}
+                    <span class="btn-add-large" style="background:var(--border);color:var(--text-tertiary);cursor:not-allowed;">Out of Stock</span>
+                {% endif %}
+                <a href="{% url 'cart' %}" class="btn-view-cart">View Cart</a>
+            </div>
+
+            <div class="feature-badges">
+                <div class="badge">
+                    <div class="badge-icon">🚚</div>
+                    <div class="badge-text">Free Shipping</div>
+                </div>
+                <div class="badge">
+                    <div class="badge-icon">🔒</div>
+                    <div class="badge-text">Secure Payment</div>
+                </div>
+                <div class="badge">
+                    <div class="badge-icon">↩️</div>
+                    <div class="badge-text">Easy Returns</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if related %}
+    <div class="related-section">
+        <h2 class="related-title">You might also like</h2>
+        <div class="related-grid">
+            {% for rel_product in related %}
+            <a href="{% url 'product_detail' rel_product.slug %}" class="small-card">
+                {% if rel_product.image %}
+                <img src="{{ rel_product.image.url }}" alt="{{ rel_product.name }}" class="small-card-img">
+                {% else %}
+                <div class="small-card-img" style="background:#e2e8f0;"></div>
+                {% endif %}
+                <div class="small-card-info">
+                    <h4 class="small-card-title">{{ rel_product.name }}</h4>
+                    <div class="small-card-price">₹{{ rel_product.price }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

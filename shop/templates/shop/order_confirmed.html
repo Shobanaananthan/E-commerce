@@ -1,0 +1,260 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Order Confirmed | ShopEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .success-banner {
+        background: var(--success-light);
+        border: 1px solid #a7f3d0;
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .checkmark-circle {
+        width: 80px;
+        height: 80px;
+        background: var(--success);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem auto;
+        color: white;
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.2);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    
+    .success-banner h1 {
+        font-family: 'DM Sans', sans-serif;
+        color: var(--primary-600);
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+    }
+    
+    .order-badge {
+        display: inline-block;
+        background: white;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-xl);
+        font-weight: 600;
+        color: var(--text);
+        box-shadow: var(--shadow-sm);
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+    }
+    
+    .details-card {
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .detail-section h3 {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 1.1rem;
+        color: var(--text);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .detail-text {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+    
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .items-table th {
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .items-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-light);
+        vertical-align: middle;
+    }
+    
+    .items-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .item-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .item-thumb {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+    }
+    
+    .item-name {
+        font-weight: 500;
+        color: var(--text);
+    }
+    
+    .total-row {
+        background: var(--bg);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    
+    .total-label {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+    
+    .total-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        .items-table th.hide-mobile, .items-table td.hide-mobile {
+            display: none;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .action-buttons .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="success-banner">
+        <div class="checkmark-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h1>Order Confirmed!</h1>
+        <p style="color: var(--text-secondary); font-size: 1.1rem;">Thank you for shopping with us, {{ order.name }}.</p>
+        <div class="order-badge">Order #{{ order.id }}</div>
+    </div>
+    
+    <div class="details-card">
+        <div class="details-grid">
+            <div class="detail-section">
+                <h3>Shipping Address</h3>
+                <div class="detail-text">
+                    <strong>{{ order.name }}</strong><br>
+                    {{ order.address|linebreaksbr }}<br>
+                    {{ order.phone }}
+                </div>
+            </div>
+            <div class="detail-section">
+                <h3>Order Info</h3>
+                <div class="detail-text">
+                    <strong>Date:</strong> {{ order.created_at|date:"F j, Y, g:i a" }}<br>
+                    <strong>Email:</strong> {{ order.email }}<br>
+                    <strong>Status:</strong> 
+                    <span style="color: var(--accent); font-weight: 600;">{{ order.get_status_display }}</span><br>
+                    <strong>Payment:</strong> Cash on Delivery
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="details-card">
+        <h3 style="font-family: 'DM Sans', sans-serif; font-size: 1.25rem; margin-bottom: 1rem; color: var(--text);">Items Ordered</h3>
+        <div style="overflow-x: auto;">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th class="hide-mobile">Price</th>
+                        <th>Qty</th>
+                        <th style="text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>
+                            <div class="item-cell">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-thumb">
+                                {% else %}
+                                    <div class="item-thumb" style="display: flex; align-items: center; justify-content: center; font-size: 10px;">No Img</div>
+                                {% endif %}
+                                <span class="item-name">{{ item.product.name }}</span>
+                            </div>
+                        </td>
+                        <td class="hide-mobile" style="color: var(--text-secondary);">₹{{ item.price|floatformat:2 }}</td>
+                        <td style="font-weight: 500;">x{{ item.quantity }}</td>
+                        <td style="text-align: right; font-weight: 600;">₹{{ item.get_subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="total-row">
+            <span class="total-label">Total Amount</span>
+            <span class="total-amount">₹{{ order.total|floatformat:2 }}</span>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <a href="{% url 'product_list' %}" class="btn btn-primary">Continue Shopping</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_orders' %}" class="btn btn-outline">View My Orders</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
